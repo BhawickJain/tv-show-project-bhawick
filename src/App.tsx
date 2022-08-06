@@ -1,69 +1,67 @@
-import React, { useEffect, useState } from "react";
-import EpisodeCard from "./components/EpisodeCard";
+import { useEffect, useState } from "react";
+import PageFooter from "./components/PageFooter";
+import PageHeader from "./components/PageHeader";
+import PageMain from "./components/PageMain";
 import Episode from "./types/Episode";
+import Show from "./types/Show";
 import fetchEpisodesFromURL from "./utils/fetchEpisodes";
-import filterEpisodes from "./utils/filterEpisodes";
-import generateEpisodeCode from "./utils/generateEpisodeCode";
+import fetchStaticShows from "./utils/fetchStaticShows";
 import getEpisodes from "./utils/getEpisodes";
+import getShows from "./utils/getShows";
+import sortShowsAlphabetically from "./utils/sortShowsAlphabetically";
 
 function App(): JSX.Element {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [episodeDisplay, setEpisodeDisplay] = useState<number[]>([]);
+  const [showDisplay, setShowDisplay] = useState<number[]>([]);
   const [episodeList, setEpisodeList] = useState<Episode[]>([]);
+  const [showList, setShowList] = useState<Show[]>([]);
+  const [selectedShow, setSelectedShow] = useState<number | null>(null);
+  const [selectedEpisode, setSelectedEpisode] = useState<number | null>(null);
 
   useEffect(() => {
-    getEpisodes(() =>
-      fetchEpisodesFromURL("https://api.tvmaze.com/shows/83/episodes")
-    ).then((data) => setEpisodeList(data));
+    getShows(() => fetchStaticShows()).then((shows) => {
+      const sortedShows = sortShowsAlphabetically(shows);
+      setShowList(sortedShows);
+      setShowDisplay(sortedShows.map((show) => show.id));
+    });
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
+  useEffect(() => {
+    const showToLoad: Show = showList.filter((sh) => sh.id === selectedShow)[0];
+    getEpisodes(() =>
+      fetchEpisodesFromURL(`${showToLoad?._links.self.href}/episodes`)
+    ).then((episodes) => {
+      selectedShow && setShowDisplay([selectedShow]);
+      setEpisodeDisplay(episodes.map((ep) => ep.id));
+      setEpisodeList(episodes);
+    });
+  }, [selectedShow, showList]);
 
   useEffect(() => {
-    console.log(searchTerm);
-  }, [searchTerm]);
+    if (selectedEpisode !== null) {
+      setEpisodeDisplay([selectedEpisode]);
+      console.log("selectedEpisode from App", selectedEpisode);
+    }
+  }, [selectedEpisode, episodeList]);
 
-  const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) =>
-    setSearchTerm(e.target.value);
-  const handleReset = () => setSearchTerm("");
-
-  const filteredEpisodes = episodeList.filter((ep) =>
-    filterEpisodes(ep, searchTerm)
-  );
   return (
     <>
-      <h1>TV Shows</h1>
-      <input type="text" value={searchTerm} onChange={handleChange} />
-      <select
-        name="episode"
-        id="episode-select"
-        onChange={handleSelect}
-        value={searchTerm}
-      >
-        <option value="">Select All</option>
-        {episodeList.map((ep) => (
-          <option key={ep.id} value={ep.name}>{`${generateEpisodeCode(ep)} - ${
-            ep.name
-          }`}</option>
-        ))}
-      </select>
-      <button onClick={handleReset}>reset search</button>
-      <p>Episodes found: {filteredEpisodes.length}</p>
-      {filteredEpisodes.map((ep) => (
-        <EpisodeCard key={ep.id} episode={ep} />
-      ))}
-
-      <footer>
-        Data has been obtained from{" "}
-        <a
-          href="https://www.tvmaze.com/api#licensing"
-          target="_blank"
-          rel="noreferrer"
-        >
-          TV Maze
-        </a>
-      </footer>
+      <PageHeader />
+      <PageMain
+        episodeList={episodeList}
+        setEpisodeList={setEpisodeList}
+        showList={showList}
+        setShowList={setShowList}
+        selectedShow={selectedShow}
+        setSelectedShow={setSelectedShow}
+        selectedEpisode={selectedEpisode}
+        setSelectedEpisode={setSelectedEpisode}
+        episodeDisplay={episodeDisplay}
+        setEpisodeDisplay={setEpisodeDisplay}
+        showDisplay={showDisplay}
+        setShowDisplay={setShowDisplay}
+      />
+      <PageFooter />
     </>
   );
 }
