@@ -1,6 +1,6 @@
 import Episode from "../types/Episode";
 import Show from "../types/Show";
-import filterItem from "../utils/filterItem";
+import presentInIdList from "../utils/presentInIdList";
 import Card from "./Card";
 
 interface DisplayListProps {
@@ -19,7 +19,7 @@ const DisplayList = ({
   onCardClick,
 }: DisplayListProps): JSX.Element => {
   const filteredItems = itemList.filter((item: Episode | Show) =>
-    filterItem(item, ids)
+    presentInIdList(item.id, ids)
   );
   console.log(
     "filtered item: ",
@@ -28,10 +28,10 @@ const DisplayList = ({
 
   return (
     <section className={`${itemType.toLowerCase()} display`}>
-      <section className="displayList">
-        <p>
-          {itemType} found: {filteredItems.length}
-        </p>
+      <p className="found">
+        {itemType} found: {filteredItems.length}
+      </p>
+      <div className="results">
         {filteredItems.map((el: Episode | Show) => (
           <Card
             key={el.id}
@@ -42,7 +42,7 @@ const DisplayList = ({
             onClick={onCardClick}
           />
         ))}
-      </section>
+      </div>
     </section>
   );
 };
