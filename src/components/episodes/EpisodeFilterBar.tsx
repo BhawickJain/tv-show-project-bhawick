@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Episode from "../../types/Episode";
 import generateEpisodeCode from "../../utils/episodes/generateEpisodeCode";
-import searchEpisode from "../../utils/episodes/searchEpisode";
 
 interface EpisodeSelectorProps {
   itemType: string;
