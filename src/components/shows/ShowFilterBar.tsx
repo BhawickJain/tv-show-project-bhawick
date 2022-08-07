@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Show from "../../types/Show";
 import searchShow from "../../utils/shows/searchShows";
 
@@ -20,10 +20,18 @@ const ShowFilterBar = ({
   setSelectedItem,
 }: ShowFilterBarProps): JSX.Element => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [dropdownSelection, setDropdownSelection] = useState("");
+
+  useEffect(() => {
+    if (selectedItem !== null) {
+      setDropdownSelection(selectedItem.toString());
+    }
+  }, [selectedItem]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setItemDisplay(searchShow(e.target.value, itemList));
     setSearchTerm(e.target.value);
+    setDropdownSelection("");
   };
 
   const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -31,9 +39,11 @@ const ShowFilterBar = ({
     if (e.target.value === "") {
       setItemDisplay(itemList.map((item) => item.id));
       setSelectedItem(null);
+      setDropdownSelection("");
     } else {
       const id = parseInt(e.target.value);
       setItemDisplay([id]);
+      setDropdownSelection(id.toString());
       setSelectedItem(id);
     }
   };
@@ -42,6 +52,7 @@ const ShowFilterBar = ({
     setItemDisplay(itemList.map((item) => item.id));
     setSelectedItem(null);
     setSearchTerm("");
+    setDropdownSelection("");
   };
 
   return (
@@ -57,7 +68,7 @@ const ShowFilterBar = ({
         name="show"
         id="show-select"
         onChange={handleSelect}
-        value={selectedItem ? selectedItem : undefined}
+        value={dropdownSelection}
       >
         <option value="">Select All</option>
         {itemList.map((el) => (
