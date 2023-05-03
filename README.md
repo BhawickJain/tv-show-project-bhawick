@@ -1,7 +1,12 @@
 # TV Show Pair Project
 
+<hr>
+<p align="center">
+⚠️ This team project is archived, but you can access the code and the development approach below ⚠️   
+</p>
+<hr>
 
-__[Notion Project Page](https://glistening-estimate-b51.notion.site/TV-Show-Pair-Project-3c15796831d146e099436f401ba2e3ca)__
+__[Notion Project Page](https://glistening-estimate-b51.notion.site/Documentation-TV-Show-9f5c082c44fa4aafb93e7f0968e1ffdd)__
 
 
 
@@ -32,3 +37,6 @@ To create a production build, use yarn build.
 You must make a React app which shows details of all of the episodes of a TV show.
 
 The episode data will come from TV Maze.
+
+## UI Wireframe
+![UI Wireframe](./docs/img/ui-wireframe.svg)
